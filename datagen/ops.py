@@ -17,7 +17,8 @@ SOCIAL_BREAK = date(2025, 3, 3)  # A2
 
 
 def build_marketing(weekly: pd.DataFrame, settings, rng: np.random.Generator):
-    """Returns (actual weekly marketing, clean/planned weekly spend)."""
+    """Returns (actual weekly marketing, clean/planned weekly spend). Marketing starts on the first full Monday."""
+    weekly = weekly[pd.to_datetime(weekly.week_start) >= pd.Timestamp(settings.start)].reset_index(drop=True)
     ws = pd.to_datetime(weekly.week_start)
     promo_week = np.clip(ws.dt.month.isin([11, 12]).astype(float) * 0.6 + ((ws.dt.month == 7).astype(float) * 0.3), 0, 1)
     rev = weekly.rev_clean.to_numpy()
@@ -79,7 +80,7 @@ def build_inventory(sales: pd.DataFrame, products: pd.DataFrame, stores: pd.Data
         sk = (launch[k] <= wk_end.astype("datetime64[ns]")) & (np.isnat(disc[k]) | (disc[k] >= wk_start.astype("datetime64[ns]")))
         active[k::K, :] &= sk[None, :]
     cat = products.category.to_numpy()[pk]
-    cover = rng.choice([4.0, 5.0, 6.0, 7.0], size=P)
+    cover = rng.choice([8.0, 10.0, 12.0, 14.0], size=P)  # weeks of cover -> roughly 4-5 inventory turns
     LEAD = 2
     A = 28
     coh = np.zeros((P, A), np.float32)
@@ -92,7 +93,7 @@ def build_inventory(sales: pd.DataFrame, products: pd.DataFrame, stores: pd.Data
     out = {k: np.zeros((P, n_weeks), np.float32) for k in ("onhand", "recv", "short", "b0", "b1", "b2", "b3", "b4")}
     week_start_ts = pd.DatetimeIndex(wk_start)
     outdoor = cat == "Outdoor & Garden"; decor = cat == "Decor"
-    dis_w = (week_start_ts >= pd.Timestamp(2023, 3, 6)) & (week_start_ts <= pd.Timestamp(2023, 5, 29))  # A5
+    dis_w = (week_start_ts >= pd.Timestamp(2023, 2, 13)) & (week_start_ts <= pd.Timestamp(2023, 5, 29))  # A5
     bulk_w = (week_start_ts >= pd.Timestamp(2024, 2, 12)) & (week_start_ts <= pd.Timestamp(2024, 2, 26))  # A6
     started = np.zeros(P, bool)
     for w in range(n_weeks):

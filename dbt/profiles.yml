@@ -1,0 +1,7 @@
+hearthloom:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../warehouse/hearthloom.duckdb
+      threads: 4

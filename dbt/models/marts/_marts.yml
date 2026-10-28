@@ -1,0 +1,125 @@
+version: 2
+models:
+- name: dim_date
+  columns:
+  - name: date_key
+    data_tests:
+    - unique
+    - not_null
+  - name: date_day
+    data_tests:
+    - unique
+    - not_null
+- name: dim_store
+  columns:
+  - name: store_id
+    data_tests:
+    - unique
+    - not_null
+  - name: store_status
+    data_tests:
+    - accepted_values:
+        arguments:
+          values:
+          - Mature
+          - New (opened in window)
+          - Closed
+          - Online
+- name: dim_product
+  columns:
+  - name: product_id
+    data_tests:
+    - unique
+    - not_null
+- name: dim_customer
+  columns:
+  - name: customer_id
+    data_tests:
+    - unique
+    - not_null
+- name: fct_sales
+  description: Grain = one order line. Source of truth for revenue, COGS and gross profit.
+  columns:
+  - name: line_id
+    data_tests:
+    - unique
+    - not_null
+  - name: store_id
+    data_tests:
+    - relationships:
+        arguments:
+          to: ref('dim_store')
+          field: store_id
+  - name: product_id
+    data_tests:
+    - relationships:
+        arguments:
+          to: ref('dim_product')
+          field: product_id
+  - name: order_date
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('dim_date')
+          field: date_day
+  - name: channel
+    data_tests:
+    - accepted_values:
+        arguments:
+          values:
+          - In-store
+          - E-commerce
+- name: fct_returns
+  columns:
+  - name: return_id
+    data_tests:
+    - unique
+    - not_null
+  - name: line_id
+    data_tests:
+    - relationships:
+        arguments:
+          to: ref('fct_sales')
+          field: line_id
+- name: fct_inventory
+  description: Grain = snapshot week x location x SKU.
+  columns:
+  - name: product_id
+    data_tests:
+    - relationships:
+        arguments:
+          to: ref('dim_product')
+          field: product_id
+  - name: store_id
+    data_tests:
+    - relationships:
+        arguments:
+          to: ref('dim_store')
+          field: store_id
+- name: fct_marketing
+  description: Grain = week x marketing channel.
+  columns:
+  - name: channel
+    data_tests:
+    - accepted_values:
+        arguments:
+          values:
+          - paid_search
+          - social
+          - email
+          - tv
+          - promotions
+- name: mart_pnl_monthly
+  description: P&L by month x region x channel x category, down to contribution after allocated marketing.
+- name: mart_orders_monthly
+- name: mart_budget_variance
+  description: Actual vs budget vs quarterly forecast for net sales and COGS (before returns).
+- name: mart_marketing_roi
+  description: Month x channel spend, attributed revenue and ROAS, with budget and forecast.
+- name: mart_inventory_monthly
+  description: Inventory turns inputs, stock-out counts and ageing buckets by month.
+- name: mart_stockout_weekly
+- name: mart_product_monthly
+- name: mart_returns_reason
+- name: mart_store_monthly

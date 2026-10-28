@@ -1,0 +1,178 @@
+version: 2
+models:
+- name: stg_stores
+  description: Cleaned store master. Includes one pseudo-store (ECOM) representing the e-commerce channel.
+  columns:
+  - name: store_id
+    data_tests:
+    - unique
+    - not_null
+  - name: region
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - Northeast
+          - Southeast
+          - Midwest
+          - West
+          - E-commerce
+  - name: channel
+    data_tests:
+    - accepted_values:
+        arguments:
+          values:
+          - In-store
+          - E-commerce
+- name: stg_products
+  description: Cleaned SKU master (300 SKUs, 8 categories).
+  columns:
+  - name: product_id
+    data_tests:
+    - unique
+    - not_null
+  - name: category
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - Furniture
+          - Bedding & Bath
+          - Kitchen & Dining
+          - Decor
+          - Lighting
+          - Storage & Organization
+          - Outdoor & Garden
+          - Rugs & Textiles
+- name: stg_customers
+  description: Customer master (about 50k synthetic customers).
+  columns:
+  - name: customer_id
+    data_tests:
+    - unique
+    - not_null
+  - name: region
+    data_tests:
+    - accepted_values:
+        arguments:
+          values:
+          - Northeast
+          - Southeast
+          - Midwest
+          - West
+- name: stg_sales
+  description: Line-item sales with derived gross sales, discount, net sales and COGS.
+  columns:
+  - name: line_id
+    data_tests:
+    - unique
+    - not_null
+  - name: store_id
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('stg_stores')
+          field: store_id
+  - name: product_id
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('stg_products')
+          field: product_id
+  - name: customer_id
+    description: Null for anonymous in-store (non-loyalty) transactions.
+    data_tests:
+    - relationships:
+        arguments:
+          to: ref('stg_customers')
+          field: customer_id
+  - name: quantity
+    data_tests:
+    - not_null
+- name: stg_returns
+  columns:
+  - name: return_id
+    data_tests:
+    - unique
+    - not_null
+  - name: line_id
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('stg_sales')
+          field: line_id
+  - name: return_reason
+    data_tests:
+    - accepted_values:
+        arguments:
+          values:
+          - Defective
+          - Not as described
+          - Changed mind
+          - Wrong size/color
+          - Damaged in shipping
+          - Arrived late
+- name: stg_inventory
+  description: Weekly Sunday inventory snapshot per location and SKU.
+  columns:
+  - name: store_id
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('stg_stores')
+          field: store_id
+  - name: product_id
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('stg_products')
+          field: product_id
+  - name: stockout_flag
+    data_tests:
+    - accepted_values:
+        arguments:
+          values:
+          - 0
+          - 1
+          quote: false
+- name: stg_marketing_spend
+  columns:
+  - name: channel
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - paid_search
+          - social
+          - email
+          - tv
+          - promotions
+- name: stg_budget
+  columns:
+  - name: region
+    data_tests:
+    - accepted_values:
+        arguments:
+          values:
+          - Northeast
+          - Southeast
+          - Midwest
+          - West
+  - name: channel
+    data_tests:
+    - accepted_values:
+        arguments:
+          values:
+          - In-store
+          - E-commerce
+- name: stg_forecast
+- name: stg_marketing_budget
+- name: stg_marketing_forecast

@@ -1,0 +1,19 @@
+version: 2
+sources:
+- name: raw
+  description: Raw tables loaded from the generator output (CSV / Parquet) into DuckDB.
+  schema: raw
+  tables:
+  - name: stores
+  - name: products
+  - name: customers
+  - name: sales
+    description: Line-item sales; one row per order line.
+  - name: returns
+  - name: inventory
+    description: Weekly (Sunday) inventory snapshot per location x SKU.
+  - name: marketing_spend
+  - name: marketing_budget
+  - name: marketing_forecast
+  - name: budget
+  - name: forecast

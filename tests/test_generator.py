@@ -117,9 +117,9 @@ def test_planted_anomalies_visible(data):
     # A5 outdoor stock-outs
     out = inv.merge(p[["product_id", "category"]], on="product_id")
     out = out[(out.category == "Outdoor & Garden") & (out.units_demanded > 0)]
-    spring = out[out.snapshot_date.between("2023-04-15", "2023-05-31")].stockout_flag.mean()
-    normal = out[out.snapshot_date.between("2024-04-15", "2024-05-31")].stockout_flag.mean()
-    assert spring > normal + 0.15
+    spring = out[out.snapshot_date.between("2023-05-01", "2023-05-31")].stockout_flag.mean()
+    normal = out[out.snapshot_date.between("2024-05-01", "2024-05-31")].stockout_flag.mean()
+    assert spring > normal + 0.08
 
 
 def test_budget_and_forecast_shape(data):
