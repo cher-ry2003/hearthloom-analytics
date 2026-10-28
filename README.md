@@ -1,13 +1,57 @@
+<div align="center">
+
 # Hearthloom Analytics
 
-**Live dashboard: https://cher-ry2003.github.io/hearthloom-analytics/**
-&nbsp;·&nbsp; [dbt docs & lineage](https://cher-ry2003.github.io/hearthloom-analytics/dbt-docs/index.html)
+### A fake company with real problems to find.
+Five years of retail data, a dbt + DuckDB warehouse, and a hand-built dashboard. Fully reproducible, one command to run.
 
-A complete, reproducible analytics sandbox built around a fictional company: five years of realistic retail data,
-a dbt + DuckDB warehouse, and a hand-built dashboard. Everything is generated from a fixed seed, so the numbers are
-the same on every machine and in CI. Use it to practise variance analysis, KPI design, dbt modelling or dashboard design.
+[![Live dashboard](https://img.shields.io/badge/live-dashboard-4338ca?style=for-the-badge)](https://cher-ry2003.github.io/hearthloom-analytics/)
+[![dbt docs](https://img.shields.io/badge/dbt-docs%20%26%20lineage-ff694b?style=for-the-badge&logo=dbt&logoColor=white)](https://cher-ry2003.github.io/hearthloom-analytics/dbt-docs/index.html)
+[![Build](https://github.com/cher-ry2003/hearthloom-analytics/actions/workflows/deploy.yml/badge.svg)](https://github.com/cher-ry2003/hearthloom-analytics/actions/workflows/deploy.yml)
+![dbt tests](https://img.shields.io/badge/dbt%20tests-103%20passing-2ea44f)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
-![Executive overview](docs/screenshots/overview-light.png)
+![dbt](https://img.shields.io/badge/dbt-DuckDB-fff000?logo=duckdb&logoColor=black)
+![Python](https://img.shields.io/badge/Python-3.11-3776ab?logo=python&logoColor=white)
+![React](https://img.shields.io/badge/React-TypeScript-149eca?logo=react&logoColor=white)
+![ECharts](https://img.shields.io/badge/Apache-ECharts-aa344d)
+![Tailwind](https://img.shields.io/badge/Tailwind-CSS-38bdf8?logo=tailwindcss&logoColor=white)
+
+**[Open the live dashboard](https://cher-ry2003.github.io/hearthloom-analytics/)**
+
+<a href="https://cher-ry2003.github.io/hearthloom-analytics/"><img src="docs/screenshots/overview-light.png" alt="Hearthloom executive overview dashboard" width="860"></a>
+
+</div>
+
+## Why this exists
+
+Most public datasets are clean, tiny, and have nothing hidden in them. Real analysis work is the opposite: a region
+quietly misses plan, a channel stops paying back, a supplier raises costs and a margin slips. This project gives you a
+believable business where those things have **already happened**, so you can practise finding them, from raw tables
+through dbt models to a dashboard.
+
+- **Practise variance analysis** on a budget, a quarterly forecast and five years of actuals.
+- **Learn analytics engineering** from a complete, tested dbt project (staging, intermediate, marts, 103 tests).
+- **Study dashboard design** in a hand-built React site, not a BI tool: light and dark themes, keyboard focus, AA contrast.
+- **Reuse it**: the generator is seeded, so everyone sees the same numbers, and CI rebuilds the whole thing on every push.
+
+> There are **8 hidden problems** in the data. The dashboard never mentions them. When you want to check your work,
+> [`ANSWER_KEY.md`](ANSWER_KEY.md) lists each one with how to find it (spoilers).
+
+## Try it in 60 seconds
+
+```bash
+git clone https://github.com/cher-ry2003/hearthloom-analytics.git
+cd hearthloom-analytics
+make setup   # virtualenv + Python and Node dependencies (once)
+make all     # generate data -> DuckDB -> dbt build + tests -> JSON -> static site in dashboard/dist
+make dev     # open the dashboard locally with hot reload
+```
+
+Or skip setup entirely and just [use the live dashboard](https://cher-ry2003.github.io/hearthloom-analytics/).
+
+**Contents:** [The company](#the-company) · [Architecture](#architecture) · [Run locally](#run-everything-locally) ·
+[dbt lineage](#dbt-model-lineage) · [Dashboard](#the-dashboard) · [Practice questions](#practice-questions) · [Layout](#repository-layout)
 
 ## The company
 
