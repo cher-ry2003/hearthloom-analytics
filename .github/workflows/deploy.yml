@@ -1,0 +1,86 @@
+name: Build and deploy dashboard
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: dashboard/package-lock.json
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generator tests
+        run: python -m pytest -q
+
+      - name: Generate synthetic data (seeded)
+        run: python -m datagen.generate --out data/raw
+
+      - name: Load raw data into DuckDB
+        run: python scripts/load_raw.py
+
+      - name: dbt build (models and tests)
+        working-directory: dbt
+        run: dbt build --profiles-dir .
+
+      - name: dbt docs
+        working-directory: dbt
+        run: dbt docs generate --static --profiles-dir .
+
+      - name: Export marts to JSON
+        run: python scripts/export_marts.py
+
+      - name: Install dashboard dependencies
+        working-directory: dashboard
+        run: npm ci
+
+      - name: Build dashboard
+        working-directory: dashboard
+        run: npm run build
+
+      - name: Add dbt docs to the site
+        run: |
+          mkdir -p dashboard/dist/dbt-docs
+          cp dbt/target/static_index.html dashboard/dist/dbt-docs/index.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dashboard/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
