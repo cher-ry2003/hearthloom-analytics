@@ -1,0 +1,24 @@
+# generated data & warehouse (regenerated in CI)
+data/raw/
+data/*.parquet
+warehouse/*.duckdb
+warehouse/*.duckdb.wal
+*.duckdb
+# python
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+# dbt
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+logs/
+# node
+dashboard/node_modules/
+dashboard/dist/
+dashboard/public/data/
+node_modules/
+# tooling
+.DS_Store
+.screenshots-tmp/
